@@ -1,0 +1,26 @@
+{
+  "haproxy_parser": {
+    "description": "Parse HAProxy traffic logs",
+    "processors": [
+      {
+        "grok": {
+          "field": "message",
+          "patterns": [
+            "%{IP:client_ip}:%{NUMBER:client_port:int} \\[%{HAPROXYDATE:haproxy_timestamp}\\] %{NOTSPACE:frontend} %{NOTSPACE:backend}/%{NOTSPACE:server} %{NUMBER:Tq:int}/%{NUMBER:Tw:int}/%{NUMBER:Tc:int}/%{NUMBER:Tr:int}/%{NUMBER:Tt:int} %{NUMBER:status:int} %{NUMBER:bytes:int} %{NOTSPACE:captured_request_cookie} %{NOTSPACE:captured_response_cookie} %{NOTSPACE:termination_state} %{NUMBER:actconn:int}/%{NUMBER:feconn:int}/%{NUMBER:beconn:int}/%{NUMBER:srvconn:int}/%{NUMBER:retries:int} %{NUMBER:srv_queue:int}/%{NUMBER:backend_queue:int} \\\"%{WORD:method} %{DATA:url} HTTP/%{NUMBER:http_version}\\\""
+          ],
+          "pattern_definitions": {
+            "HAPROXYDATE": "%{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME}"
+          },
+          "on_failure": [
+            {
+              "set": {
+                "field": "error",
+                "value": "grok_failure"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
